@@ -28,9 +28,46 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import Vue from "vue";
+import { KmsProvider } from "aws-kms-provider";
+import Web3 from "web3";
 
-export default Vue.extend({})
+async function sign() {
+  const accessKeyId = "xxx";
+  const secretAccessKey = "yyy";
+
+  const region = "us-east-1";
+  const keyId = "e9005048-475f-4767-9f2d-0d1fb0c89caf";
+  const endpoint =
+    "https://ropsten.infura.io/v3/bd35010d62134981a9e82dff4708728b";
+
+  const provider = new KmsProvider(endpoint, {
+    region,
+    keyIds: [keyId],
+    credential: {
+      accessKeyId,
+      secretAccessKey
+    }
+  });
+
+  const web3 = new Web3(provider);
+
+  const accounts = await web3.eth.getAccounts();
+
+  const message = "poyo";
+  const signature = await web3.eth.sign(message, accounts[0]);
+  /*
+  asyncToGenerator.js?1da1:6 Uncaught (in promise) TypeError: _constant__WEBPACK_IMPORTED_MODULE_2__.secp256k1N.sub(...).toBuffer is not a function
+  が出るかも？
+  */
+  console.log({ signature });
+}
+
+export default Vue.extend({
+  mounted() {
+    sign();
+  }
+});
 </script>
 
 <style>
@@ -44,16 +81,8 @@ export default Vue.extend({})
 }
 
 .title {
-  font-family:
-    'Quicksand',
-    'Source Sans Pro',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    'Helvetica Neue',
-    Arial,
-    sans-serif;
+  font-family: "Quicksand", "Source Sans Pro", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   display: block;
   font-weight: 300;
   font-size: 100px;
